@@ -39,7 +39,14 @@ god_t chieftain_get_god(chieftain_t *self)
 
 void chieftain_finalize(chieftain_t *self)
 {
-    /* TODO: Adicionar código aqui se necessário! */
-
+    pthread_mutex_destroy(&self->table_mutex);
+    pthread_cond_destroy(&self->table_cond);
+    free(self->chairs);
+    free(self->plates);
+    for (int i = 0; i < config.table_size; i++)
+    {
+        free(self->assigned_plates[i]);
+    }
+    free(self->assigned_plates);
     plog("[chieftain] Finalized\n");
 }

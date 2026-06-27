@@ -5,8 +5,15 @@
 
 void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 {
-    /* TODO: Adicionar código aqui se necessário! */
- 
+    pthread_mutex_init(&self->table_mutex, NULL);
+    pthread_cond_init(&self->table_cond, NULL);
+    self->chairs = (int *)malloc(sizeof(int) * config.table_size);
+    self->plates = (int *)malloc(sizeof(int) * config.table_size);
+    self->assigned_plates = (int **)malloc(sizeof(int *) * config.table_size);
+    for (int i = 0; i < config.table_size; i++)
+    {
+        self->assigned_plates[i] = (int *)calloc(2, sizeof(int));
+    }
     self->valhalla = valhalla;
     plog("[chieftain] Initialized\n");
 }

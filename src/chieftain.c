@@ -3,6 +3,10 @@
 #include "chieftain.h"
 #include "valhalla.h"
 
+/* Criação de funções utilitárias */
+static inline int left_of(int i, int N) {return (i - 1 + N) % N;}
+static inline int right_of(int i, int N) {return (i + 1) % N;}
+
 void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 {
     pthread_mutex_init(&self->table_mutex, NULL);

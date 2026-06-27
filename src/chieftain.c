@@ -20,6 +20,7 @@
 /* Criação de funções utilitárias */
 static inline int left_of(int i, int N) {return (i - 1 + N) % N;}
 static inline int right_of(int i, int N) {return (i + 1) % N;}
+static inline int is_table_gap (int a, int b, int N) {return (a == N - 1 && b == 0) || (a == 0 && b == N - 1);}
 static inline int neighbot_is_safe(chieftain_t *self, int viz, int viking_type)
 {
     return (self->chairs[viz] == CHAIR_EMPTY) || self->chairs[viz] == viking_type;

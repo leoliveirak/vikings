@@ -21,9 +21,10 @@
         chieftain_t *chieftain; /* Referência para chieftain.     */
         valhalla_t *valhalla;   /* Referência para valhalla.      */
 
-        /* TODO: Adicione aqui os atributos que achar necessários para implementar o
-        comportamento da horda de vikings. Esses atributos deverão ser usados pelas
-        funções da horda de vikings. */
+        /* Sincronização da barreira (jantar -> preces) */
+        pthread_mutex_t barrier_mutex; /* Mutex para sincronizar a barreira. */
+        pthread_cond_t barrier_cond;   /* Condição para sincronizar a barreira. */
+        int barrier_count;             /* Contador para a barreira. */
     } horde_t;
 
     /*============================================================================*

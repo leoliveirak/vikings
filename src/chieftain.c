@@ -7,8 +7,8 @@ void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 {
     pthread_mutex_init(&self->table_mutex, NULL);
     pthread_cond_init(&self->table_cond, NULL);
-    self->chairs = (int *)malloc(sizeof(int) * config.table_size);
-    self->plates = (int *)malloc(sizeof(int) * config.table_size);
+    self->chairs = (int *)calloc(config.table_size, sizeof(int));
+    self->plates = (int *)calloc(config.table_size, sizeof(int));
     self->assigned_plates = (int **)malloc(sizeof(int *) * config.table_size);
     for (int i = 0; i < config.table_size; i++)
     {

@@ -116,7 +116,19 @@ int chieftain_acquire_seat_plates(chieftain_t *self, int berserker)
 
 void chieftain_release_seat_plates(chieftain_t *self, int pos)
 {
-    /* TODO: Implementar! */
+    pthread_mutex_lock(&self->table_mutex);
+
+    int p1 = self->assigned_plates[pos][PLATE_SLOT_A];
+    int p2 = self->assigned_plates[pos][PLATE_SLOT_B];
+
+    self->chairs[pos] = CHAIR_EMPTY;
+    self->plates[p1] = PLATE_FREE;
+    self->plates[p2] = PLATE_FREE;
+    self->assigned_plates[pos][PLATE_SLOT_A] = PLATE_SLOT_NONE;
+    self->assigned_plates[pos][PLATE_SLOT_B] = PLATE_SLOT_NONE;
+
+    pthread_cond_broadcast(&self->table_cond);
+    pthread_mutex_unlock(&self->table_mutex);
 }
 
 god_t chieftain_get_god(chieftain_t *self)

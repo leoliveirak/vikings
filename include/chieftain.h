@@ -1,6 +1,7 @@
 #ifndef __CHIEFTAIN_H__
 #define __CHIEFTAIN_H__
 
+    #include <pthread.h>
     #include "config.h"
     #include "valhalla.h"
 
@@ -17,9 +18,14 @@
     {
         valhalla_t *valhalla;   /* Referência para valhalla.  */
         
-        /* TODO: Adicione aqui os atributos que achar necessários para implementar o
-        comportamento do chieftain. Esses atributos deverão ser usados pelas funções
-        do chieftain. */
+        /* Sincronização global da mesa */
+        pthread_mutex_t table_mutex;
+        pthread_cond_t table_cond;
+
+        /* Controle da mesa */
+        int *chairs;            /* Array[config.table_size] (ex: 0 = livre, 1 = Normal, 2 = Berserker) */
+        int *plates;            /* Array[config.table_size] (ex: 0 = livre, 1 = Ocupado) */
+        int **assigned_plates;  /* Matriz[config.table_size][2] que guarda os 2 pratos pegos por cada assento */
     } chieftain_t;
 
     /*============================================================================*

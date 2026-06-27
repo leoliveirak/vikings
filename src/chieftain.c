@@ -21,8 +21,12 @@
 static inline int left_of(int i, int N) {return (i - 1 + N) % N;}
 static inline int right_of(int i, int N) {return (i + 1) % N;}
 static inline int is_table_gap (int a, int b, int N) {return (a == N - 1 && b == 0) || (a == 0 && b == N - 1);}
-static inline int neighbot_is_safe(chieftain_t *self, int viz, int viking_type)
+static inline int neighbot_is_safe(chieftain_t *self, int me, int viz, int viking_type, int N)
 {
+    if (is_table_gap(me, viz, N))
+    {
+        return 1;
+    }
     return (self->chairs[viz] == CHAIR_EMPTY) || self->chairs[viz] == viking_type;
 }
 
@@ -84,8 +88,8 @@ int chieftain_acquire_seat_plates(chieftain_t *self, int berserker)
             int right = right_of(i, N);
 
             /* Regra 2: vizinhos seguros */
-            if (!neighbot_is_safe(self, left, viking_type) ||
-                !neighbot_is_safe(self, right, viking_type))
+            if (!neighbot_is_safe(self, i, left, viking_type, N) ||
+                !neighbot_is_safe(self, i,  right, viking_type, N))
             {
                 continue;
             }

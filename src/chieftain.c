@@ -63,8 +63,55 @@ void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 
 int chieftain_acquire_seat_plates(chieftain_t *self, int berserker)
 {
-    /* TODO: Implementar! */
-    return 1;
+    int viking_type = berserker;
+    int N = config.table_size;
+    int seat = -1;
+
+    pthread_mutex_lock(&self->table_mutex);
+
+    while(1)
+    {
+        for (int i = 0; i < N; i++)
+        {
+            /* Regra 1: cadeira livre */
+            if (self->chairs[i] != CHAIR_EMPTY)
+            {
+                continue;
+            }
+
+            int left = left_of(i, N);
+            int right = right_of(i, N);
+
+            /* Regra 2: vizinhos seguros */
+            if (!neighbot_is_safe(self, left, viking_type) ||
+                !neighbot_is_safe(self, right, viking_type))
+            {
+                continue;
+            }
+
+            /* Regra 3: encontrar par de pratos livres */
+            int p1, p2;
+            if (!find_free_plate_pair(self, i, left, right, &p1, &p2))
+            {
+                continue;
+            }
+
+            self->chairs[i] = viking_type;
+            self->plates[p1] = PLATE_TAKEN;
+            self->plates[p2] = PLATE_TAKEN;
+            self->assigned_plates[i][PLATE_SLOT_A] = p1;
+            self->assigned_plates[i][PLATE_SLOT_B] = p2;
+            seat = i;
+            break;
+        }
+        if (seat != -1)
+        {
+            break;
+        }
+        pthread_cond_wait(&self->table_cond, &self->table_mutex);
+    }
+    pthread_mutex_unlock(&self->table_mutex);
+    return seat;
 }
 
 void chieftain_release_seat_plates(chieftain_t *self, int pos)

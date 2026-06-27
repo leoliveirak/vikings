@@ -27,9 +27,7 @@
     {
         unsigned int prayers[NUMBER_OF_GODS]; /* Controla o número de preces por deus. */
 
-        /* TODO: Adicione aqui os atributos que achar necessários para implementar o
-        comportamento de valhalla. Esses atributos deverão ser usados pelas funções
-        de valhalla. */
+        pthread_mutex_t prayers_mutex; /* Mutex para sincronizar o acesso ao número de preces. */
     } valhalla_t;
 
     /*============================================================================*

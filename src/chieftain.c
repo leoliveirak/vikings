@@ -3,6 +3,20 @@
 #include "chieftain.h"
 #include "valhalla.h"
 
+/* Cadeiras */
+#define CHAIR_EMPTY     0
+#define CHAIR_WARRIOR   1
+#define CHAIR_BERSERKER 2
+
+/* Pratos */
+#define PLATE_FREE      0
+#define PLATE_TAKEN     1
+
+/* Indices da matriz de pratos */
+#define PLATE_SLOT_A    0
+#define PLATE_SLOT_B    1
+#define PLATE_SLOT_NONE -1
+
 /* Criação de funções utilitárias */
 static inline int left_of(int i, int N) {return (i - 1 + N) % N;}
 static inline int right_of(int i, int N) {return (i + 1) % N;}

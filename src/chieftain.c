@@ -25,6 +25,27 @@ static inline int neighbot_is_safe(chieftain_t *self, int viz, int viking_type)
     return (self->chairs[viz] == CHAIR_EMPTY) || self->chairs[viz] == viking_type;
 }
 
+static int find_free_plate_pair(chieftain_t *self, int i, int esq, int dir,
+                                int *p1, int *p2) 
+{
+    int candidates[3] = { i, esq, dir };
+
+    for (int a = 0; a < 3; a++) {
+        for (int b = a + 1; b < 3; b++) {
+            int pa = candidates[a];
+            int pb = candidates[b];
+            if (self->plates[pa] == PLATE_FREE && 
+                self->plates[pb] == PLATE_FREE)
+            {
+                *p1 = pa;
+                *p2 = pb;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
 void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 {
     pthread_mutex_init(&self->table_mutex, NULL);

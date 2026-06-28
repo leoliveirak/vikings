@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-#include "viking.h"
-#include "valhalla.h"
+#include "../include/viking.h"
+#include "../include/valhalla.h"
 
 void viking_init(viking_t *self, chieftain_t *chieftain, valhalla_t *valhalla, int berserker, int type, unsigned int id)
 {

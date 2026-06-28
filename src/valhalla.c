@@ -2,8 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "valhalla.h"
-#include "config.h"
+#include "../include/valhalla.h"
+#include "../include/config.h"
 
 #define MAX(a,b) (((a)>(b))?(a):(b))
 

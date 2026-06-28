@@ -24,7 +24,7 @@
      * @brief Define os atributos de valhalla.
      */
     typedef struct valhalla
-    {
+    {   
         unsigned int prayers[NUMBER_OF_GODS]; /* Controla o número de preces por deus. */
 
         pthread_mutex_t prayers_mutex; /* Mutex para sincronizar o acesso ao número de preces. */

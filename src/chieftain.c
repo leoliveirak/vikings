@@ -68,7 +68,7 @@ void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 
 int chieftain_acquire_seat_plates(chieftain_t *self, int berserker)
 {
-    int viking_type = berserker;
+    int viking_type = berserker ? CHAIR_BERSERKER : CHAIR_WARRIOR;
     int N = config.table_size;
     int seat = -1;
 

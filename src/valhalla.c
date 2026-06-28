@@ -28,7 +28,7 @@ void valhalla_finalize(valhalla_t *self)
 void valhalla_pray(valhalla_t *self, god_t god)
 {
     /* TODO: Adicionar código se necessário! */
-
+    
     /* Atualiza o número de preces do deus god. */
     self->prayers[god]++;
 

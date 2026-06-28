@@ -2,8 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "../include/valhalla.h"
-#include "../include/config.h"
+#include "valhalla.h"
+#include "config.h"
 
 #define MAX(a,b) (((a)>(b))?(a):(b))
 
@@ -60,6 +60,7 @@ god_t valhalla_get_rival(god_t god)
         return god + 1;
     return god - 1;
 }
+
 
 char * valhalla_get_name(god_t god)
 {

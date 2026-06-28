@@ -70,7 +70,8 @@ void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 
 int chieftain_acquire_seat_plates(chieftain_t *self, int berserker)
 {
-    int viking_type = berserker;
+
+    int viking_type = berserker ? CHAIR_BERSERKER : CHAIR_WARRIOR;
     int N = config.table_size;
     int seat = -1;
 
@@ -152,7 +153,7 @@ god_t chieftain_get_god(chieftain_t *self)
     pthread_mutex_unlock(&self->table_mutex);
     
     god_t god = (rand() % NUMBER_OF_GODS);
-  
+
     return god;
 }
 

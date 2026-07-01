@@ -26,6 +26,10 @@
         int *chairs;            /* Array[config.table_size] (ex: 0 = livre, 1 = Normal, 2 = Berserker) */
         int *plates;            /* Array[config.table_size] (ex: 0 = livre, 1 = Ocupado) */
         int **assigned_plates;  /* Matriz[config.table_size][2] que guarda os 2 pratos pegos por cada assento */
+
+        /* Barreira Comer/Rezar */
+        int vikings_finish_eating; /* Contador para quantos vikings terminaram de comer */ 
+        pthread_cond_t pray_cond;  /* Condição para começar as preces */
     } chieftain_t;
 
     /*============================================================================*

@@ -55,9 +55,13 @@ void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 {
     pthread_mutex_init(&self->table_mutex, NULL);
     pthread_cond_init(&self->table_cond, NULL);
+
     self->chairs = (int *)calloc(config.table_size, sizeof(int));
     self->plates = (int *)calloc(config.table_size, sizeof(int));
     self->assigned_plates = (int **)malloc(sizeof(int *) * config.table_size);
+
+    pthread_cond_init(&self->pray_cond, NULL);
+    self->vikings_finish_eating = 0;
     for (int i = 0; i < config.table_size; i++)
     {
         self->assigned_plates[i] = (int *)calloc(2, sizeof(int));
@@ -134,20 +138,36 @@ void chieftain_release_seat_plates(chieftain_t *self, int pos)
 
     pthread_cond_broadcast(&self->table_cond);
     pthread_mutex_unlock(&self->table_mutex);
+
+    /* Verificação de Barreira Comer/Rezar */
+    if (++self->vikings_finish_eating == config.horde_size) pthread_cond_broadcast(&self->pray_cond);
+   
+    pthread_cond_broadcast(&self->table_cond);
+    pthread_mutex_unlock(&self->table_mutex);
+  
 }
 
 god_t chieftain_get_god(chieftain_t *self)
 {
     /* TODO: Implementar! O código abaixo deve ser modificado! */
-    god_t god = THOR;
+
+    pthread_mutex_lock(&self->table_mutex);
+    while (self->vikings_finish_eating < config.horde_size)
+        pthread_cond_wait(&self->pray_cond, &self->table_mutex);
+    pthread_mutex_unlock(&self->table_mutex);
     
+    god_t god = (rand() % NUMBER_OF_GODS);
+
     return god;
 }
 
 void chieftain_finalize(chieftain_t *self)
 {
     pthread_mutex_destroy(&self->table_mutex);
+
     pthread_cond_destroy(&self->table_cond);
+    pthread_cond_destroy(&self->pray_cond);
+
     free(self->chairs);
     free(self->plates);
     for (int i = 0; i < config.table_size; i++)

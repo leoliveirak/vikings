@@ -61,6 +61,7 @@ god_t valhalla_get_rival(god_t god)
     return god - 1;
 }
 
+
 char * valhalla_get_name(god_t god)
 {
     switch (god) {

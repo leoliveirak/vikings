@@ -63,6 +63,7 @@ void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 
     pthread_cond_init(&self->pray_cond, NULL);
     self->vikings_finish_eating = 0;
+
     for (int i = 0; i < config.table_size; i++)
     {
         self->assigned_plates[i] = (int *)calloc(2, sizeof(int));

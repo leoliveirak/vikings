@@ -30,6 +30,10 @@
         /* Barreira Comer/Rezar */
         int vikings_finish_eating; /* Contador para quantos vikings terminaram de comer */ 
         pthread_cond_t pray_cond;  /* Condição para começar as preces */
+    
+        int livres[NUMBER_OF_GODS];          /* Deuses que o cheftain vai poder distribuir */ 
+        pthread_mutex_t livres_mutex;
+
     } chieftain_t;
 
     /*============================================================================*

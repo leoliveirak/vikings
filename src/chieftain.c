@@ -2,6 +2,7 @@
 #include "config.h"
 #include "chieftain.h"
 #include "valhalla.h"
+#include <math.h>
 
 /* Cadeiras */
 #define CHAIR_EMPTY     0
@@ -66,6 +67,12 @@ void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
     {
         self->assigned_plates[i] = (int *)calloc(2, sizeof(int));
     }
+
+    for (int i = 0; i < NUMBER_OF_GODS; i++)
+        self->livres[i] = 0;
+
+    pthread_mutex_init(&self->livres_mutex, NULL);
+    
     self->valhalla = valhalla;
     plog("[chieftain] Initialized\n");
 }
@@ -136,9 +143,6 @@ void chieftain_release_seat_plates(chieftain_t *self, int pos)
     self->assigned_plates[pos][PLATE_SLOT_A] = PLATE_SLOT_NONE;
     self->assigned_plates[pos][PLATE_SLOT_B] = PLATE_SLOT_NONE;
 
-    pthread_cond_broadcast(&self->table_cond);
-    pthread_mutex_unlock(&self->table_mutex);
-
     /* Verificação de Barreira Comer/Rezar */
     if (++self->vikings_finish_eating == config.horde_size) pthread_cond_broadcast(&self->pray_cond);
    
@@ -149,14 +153,48 @@ void chieftain_release_seat_plates(chieftain_t *self, int pos)
 
 god_t chieftain_get_god(chieftain_t *self)
 {
-    /* TODO: Implementar! O código abaixo deve ser modificado! */
-
     pthread_mutex_lock(&self->table_mutex);
     while (self->vikings_finish_eating < config.horde_size)
         pthread_cond_wait(&self->pray_cond, &self->table_mutex);
     pthread_mutex_unlock(&self->table_mutex);
     
-    god_t god = (rand() % NUMBER_OF_GODS);
+    god_t candidatos[NUMBER_OF_GODS];
+    int count = 0;  
+
+    pthread_mutex_lock(&self->livres_mutex);
+
+    for (god_t i = 0; i < NUMBER_OF_GODS; i++) {
+        
+        if (!valhalla_is_super(i)) {
+            god_t rival = valhalla_get_rival(i);
+            int permitido = ceil((1.0 + RIVAL_TOLERANCE_RATE) * self->livres[rival]);
+            
+            if (permitido < 1) permitido = 1;
+            
+            if (self->livres[i] < permitido)
+                candidatos[count++] = i;
+        
+        } else {
+            int total = 0;
+            
+            for (int j = 0; j < NUMBER_OF_GODS; j++) 
+                
+            if (!valhalla_is_super((god_t) j))
+                    total += self->livres[j];
+
+            int permitido = ceil((1.0 + SUPER_GOD_TOLERANCE_RATE) * total);
+            
+            if (permitido < 1) permitido = 1;
+            
+            if (self->livres[i] < permitido)
+                candidatos[count++] = i;
+        }
+    }
+
+    god_t god = candidatos[rand() % count];
+    self->livres[god]++;  // registra a concessão
+
+    pthread_mutex_unlock(&self->livres_mutex);  // libera antes de retornar
 
     return god;
 }
@@ -164,6 +202,7 @@ god_t chieftain_get_god(chieftain_t *self)
 void chieftain_finalize(chieftain_t *self)
 {
     pthread_mutex_destroy(&self->table_mutex);
+    pthread_mutex_destroy(&self->livres_mutex);
 
     pthread_cond_destroy(&self->table_cond);
     pthread_cond_destroy(&self->pray_cond);

@@ -2,11 +2,15 @@
 #include "config.h"
 #include "chieftain.h"
 #include "valhalla.h"
+#include <math.h>
 
 void chieftain_init(chieftain_t *self, valhalla_t *valhalla)
 {
-    /* TODO: Adicionar código aqui se necessário! */
- 
+    for (int i = 0; i < NUMBER_OF_GODS; i++)
+        self->livres[i] = 0;
+
+    pthread_mutex_init(&self->livres_mutex, NULL);
+    
     self->valhalla = valhalla;
     plog("[chieftain] Initialized\n");
 }
@@ -24,39 +28,43 @@ void chieftain_release_seat_plates(chieftain_t *self, int pos)
 
 god_t chieftain_get_god(chieftain_t *self)
 {
-    
-    god_t god = rand() % NUMBER_OF_GODS;
-    
-    if (!valhalla_is_super(god)){
+    god_t candidatos[NUMBER_OF_GODS];
+    int count = 0;  
 
-        god_t rival = valhalla_get_rival(god);
-        
-        pthread_mutex_lock(&self->valhalla->prayers_mutex);
-        if (self->valhalla->prayers[god] > 1.05 * self->valhalla->prayers[rival]){
-            god = rival;
-        }
-        pthread_mutex_unlock(&self->valhalla->prayers_mutex);
-    
-    } else {
-        
-        unsigned int total = 0;
-        
-        for (size_t i = 0; i < 6; i++){
-            pthread_mutex_lock(&self->valhalla->prayers_mutex);
-            total += self->valhalla->prayers[i];
-            pthread_mutex_unlock(&self->valhalla->prayers_mutex); 
-        }
-        pthread_mutex_lock(&self->valhalla->prayers_mutex);
-        
-        if(self->valhalla->prayers[god] > 1.1 * total){
-        
-            pthread_mutex_unlock(&self->valhalla->prayers_mutex);
-            return chieftain_get_god(self);
-        
-        }
-        pthread_mutex_unlock(&self->valhalla->prayers_mutex);
+    pthread_mutex_lock(&self->livres_mutex);
 
+    for (god_t i = 0; i < NUMBER_OF_GODS; i++) {
+        
+        if (!valhalla_is_super(i)) {
+            god_t rival = valhalla_get_rival(i);
+            int permitido = ceil((1.0 + RIVAL_TOLERANCE_RATE) * self->livres[rival]);
+            
+            if (permitido < 1) permitido = 1;
+            
+            if (self->livres[i] < permitido)
+                candidatos[count++] = i;
+        
+        } else {
+            int total = 0;
+            
+            for (int j = 0; j < NUMBER_OF_GODS; j++) 
+                
+            if (!valhalla_is_super((god_t) j))
+                    total += self->livres[j];
+
+            int permitido = ceil((1.0 + SUPER_GOD_TOLERANCE_RATE) * total);
+            
+            if (permitido < 1) permitido = 1;
+            
+            if (self->livres[i] < permitido)
+                candidatos[count++] = i;
+        }
     }
+
+    god_t god = candidatos[rand() % count];
+    self->livres[god]++;  // registra a concessão
+
+    pthread_mutex_unlock(&self->livres_mutex);  // libera antes de retornar
 
     return god;
 }
@@ -64,6 +72,8 @@ god_t chieftain_get_god(chieftain_t *self)
 void chieftain_finalize(chieftain_t *self)
 {
     /* TODO: Adicionar código aqui se necessário! */
+
+    pthread_mutex_destroy(&self->livres_mutex);
 
     plog("[chieftain] Finalized\n");
 }

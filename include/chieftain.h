@@ -26,6 +26,10 @@
         int *chairs;            /* Array[config.table_size] (ex: 0 = livre, 1 = Normal, 2 = Berserker) */
         int *plates;            /* Array[config.table_size] (ex: 0 = livre, 1 = Ocupado) */
         int **assigned_plates;  /* Matriz[config.table_size][2] que guarda os 2 pratos pegos por cada assento */
+    
+        int livres[NUMBER_OF_GODS];          /* Deuses que o cheftain vai poder distribuir */ 
+        pthread_mutex_t livres_mutex;
+
     } chieftain_t;
 
     /*============================================================================*
